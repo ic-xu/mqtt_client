@@ -7,8 +7,11 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'package:mqtt_client/customer/customer_mqtt_client.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
+
+import '../lib/mqtt_server_client.dart';
 
 /// An annotated simple subscribe/publish usage example for mqtt_server_client. Please read in with reference
 /// to the MQTT specification. The example is runnable, also refer to test/mqtt_client_broker_test...dart
@@ -24,7 +27,7 @@ import 'package:mqtt_client/mqtt_server_client.dart';
 /// of 1883 is used.
 /// If you want to use websockets rather than TCP see below.
 
-final client = MqttServerClient('localhost', 'test-flutter');
+final client = CustomerMqttClient('localhost', 'test-flutter');
 
 Future<int> main() async {
   /// A websocket URL must start with ws:// or wss:// or Dart will throw an exception, consult your websocket MQTT broker

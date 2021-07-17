@@ -6,8 +6,8 @@ import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:event_bus/event_bus.dart' as events;
 import 'customer/subscribe/customer_subscriptions_manager.dart';
 
-class CustomerMqttClient extends MqttBrowserClient {
-  CustomerMqttClient(String server, String clientIdentifier)
+class CustomerMqttBrowserClient extends MqttBrowserClient {
+  CustomerMqttBrowserClient(String server, String clientIdentifier)
       : super(server, clientIdentifier);
 
   /// Published message stream. A publish message is added to this
