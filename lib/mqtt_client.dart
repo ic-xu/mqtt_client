@@ -169,10 +169,3 @@ part 'src/utility/mqtt_client_utilities.dart';
 part 'src/connectionhandling/mqtt_client_mqtt_connection_keep_alive.dart';
 
 part 'src/connectionhandling/mqtt_client_read_wrapper.dart';
-
-//新增加的代码
-part 'customer/customer/mqtt_client_mqtt_customer_message.dart';
-
-part 'customer/customer/mqtt_client_mqtt_customer_variable_header.dart';
-
-part 'customer/customer/mqtt_client_mqtt_customer_payload.dart';

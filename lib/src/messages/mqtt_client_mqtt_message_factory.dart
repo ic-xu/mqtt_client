@@ -14,10 +14,6 @@ class MqttMessageFactory {
       MqttHeader header, MqttByteBuffer messageStream) {
     MqttMessage message;
     switch (header.messageType) {
-      case MqttMessageType.reserved1:
-        message = MqttCustomerMessage.fromByteBuffer(header, messageStream);
-        break;
-
       case MqttMessageType.connect:
         message = MqttConnectMessage.fromByteBuffer(header, messageStream);
         break;
