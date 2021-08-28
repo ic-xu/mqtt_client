@@ -78,7 +78,7 @@ class CustomerMqttClient extends MqttServerClient {
     if (keepAlivePeriod != MqttClientConstants.defaultKeepAlive) {
       MqttLogger.log(
           'MqttClient::connect - keep alive is enabled with a value of $keepAlivePeriod seconds');
-      keepAlive = MqttConnectionKeepAlive(connectionHandler, keepAlivePeriod);
+      keepAlive = MqttConnectionKeepAlive(connectionHandler,clientEventBus, keepAlivePeriod);
       if (pongCallback != null) {
         keepAlive!.pongCallback = pongCallback;
       }
