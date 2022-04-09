@@ -23,7 +23,7 @@ class MqttConnectionBase {
 
   /// The stream controller as returned when clients listen.
   @protected
-  late StreamSubscription listener;
+  StreamSubscription? listener;
 
   /// The read wrapper
   @protected
@@ -79,18 +79,16 @@ class MqttConnectionBase {
 
   void _disconnect() {
     if (client != null) {
-      listener.cancel();
+      listener?.cancel();
       client.destroy();
       client.close();
       client = null;
     }
   }
 
-  void stopListening() {
-    if (client != null) {
-      listener.cancel();
-    }
-  }
+  /// Stops listening and closes the socket immediately, must be overridden in
+  /// connection classes
+  void stopListening() {}
 
   /// User requested or auto disconnect disconnection
   @protected
