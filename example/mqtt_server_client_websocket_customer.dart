@@ -7,12 +7,13 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'package:mqtt_client/customer/customer_mqtt_client.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 
-/// An annotated simple subscribe/publish usage example for mqtt_server_client using websockets.
-/// Please read in with reference to the MQTT specification. The example is runnable, also refer to
-/// test/mqtt_client_broker_test...dart files for separate subscribe/publish tests.
+/// An annotated simple subscribe/publish usage example for mqtt_server_client. Please read in with reference
+/// to the MQTT specification. The example is runnable, also refer to test/mqtt_client_broker_test...dart
+/// files for separate subscribe/publish tests.
 
 /// First create a client, the client is constructed with a broker name, client identifier
 /// and port if needed. The client identifier (short ClientId) is an identifier of each MQTT
@@ -22,21 +23,27 @@ import 'package:mqtt_client/mqtt_server_client.dart';
 /// A condition is that clean session connect flag is true, otherwise the connection will be rejected.
 /// The client identifier can be a maximum length of 23 characters. If a port is not specified the standard port
 /// of 1883 is used.
+/// If you want to use websockets rather than TCP see below.
 
-/// A websocket URL must start with ws:// or wss:// or Dart will throw an exception, consult your websocket MQTT broker
-/// for details.
-final client = MqttServerClient('ws://127.0.0.1', 'fffff');
+final client = CustomerMqttClient('ws://localhost', 'test-flutter');
 
 Future<int> main() async {
   client.useWebSocket = true;
   client.port = 8988; // ( or whatever your ws port is)
+
+  /// A websocket URL must start with ws:// or wss:// or Dart will throw an exception, consult your websocket MQTT broker
+  /// for details.
+  /// To use websockets add the following lines -:
+  /// client.useWebSocket = true;
+  /// client.port = 80;  ( or whatever your WS port is)
+  /// There is also an alternate websocket implementation for specialist use, see useAlternateWebSocketImplementation
+  /// Note do not set the secure flag if you are using wss, the secure flags is for TCP sockets only.
   /// You can also supply your own websocket protocol list or disable this feature using the websocketProtocols
   /// setter, read the API docs for further details here, the vast majority of brokers will support the client default
   /// list so in most cases you can ignore this.
-  /// client.websocketProtocols = ['myString'];
 
   /// Set logging on if needed, defaults to off
-  client.logging(on: true);
+  client.logging(on: false);
 
   /// If you intend to use a keep alive you must set it here otherwise keep alive will be disabled.
   client.keepAlivePeriod = 20;
@@ -126,35 +133,27 @@ Future<int> main() async {
         'EXAMPLE::Published notification:: topic is ${message.variableHeader!.topicName}, with Qos ${message.header!.qos}');
   });
 
-  /// Lets publish to our topic
-  /// Use the payload builder rather than a raw buffer
-  /// Our known topic to publish to
-  const pubTopic = 'Dart/Mqtt_client/testtopic';
+
+
+  client.customer!.listen((MqttCustomerMessage messages) {
+    print(
+        'EXAMPLE::Published notification:: message is ${messages.payload.toString()}, with Qos ${messages.header!.qos}');
+  });
+
   final builder = MqttClientPayloadBuilder();
-  builder.addString('Hello from mqtt_client');
 
-  /// Subscribe to it
-  print('EXAMPLE::Subscribing to the Dart/Mqtt_client/testtopic topic');
-  client.subscribe(pubTopic, MqttQos.exactlyOnce);
+  while(true){
+    // var line = stdin.readLineSync();
+    await MqttUtilities.asyncSleep(20);
+    builder.clear();
+    builder.addUTF8String("customer --- ");
+    var message = MqttCustomerMessage(1,builder.payload);
+    client.sendCustomerMessage(message);
+    // builder.clear();
+    // builder.addUTF8String("line!.trim()");
+    // client.publishMessage(topic, MqttQos.atMostOnce, builder.payload!);
+  }
 
-  /// Publish it
-  print('EXAMPLE::Publishing our topic');
-  client.publishMessage(pubTopic, MqttQos.exactlyOnce, builder.payload!);
-
-  /// Ok, we will now sleep a while, in this gap you will see ping request/response
-  /// messages being exchanged by the keep alive mechanism.
-  print('EXAMPLE::Sleeping....');
-  await MqttUtilities.asyncSleep(120);
-
-  /// Finally, unsubscribe and exit gracefully
-  print('EXAMPLE::Unsubscribing');
-  client.unsubscribe(topic);
-
-  /// Wait for the unsubscribe message from the broker if you wish.
-  await MqttUtilities.asyncSleep(2);
-  print('EXAMPLE::Disconnecting');
-  client.disconnect();
-  return 0;
 }
 
 /// The subscribed callback
